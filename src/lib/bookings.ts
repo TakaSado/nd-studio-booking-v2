@@ -53,3 +53,22 @@ export async function createBooking(b: Omit<Booking, 'id' | 'status' | 'createdA
   return id
 }
 
+export async function isLockValid(bookingId: string): Promise<boolean> {
+  const ref = adminDb.collection('locks').doc(bookingId)
+  const snap = await ref.get()
+  if (!snap.exists) return false
+  const expiresAt = snap.get('expiresAt') as admin.firestore.Timestamp
+  return expiresAt.toMillis() > Date.now()
+}
+
+export async function upsertBookingAdmin(id: string, payload: Partial<Booking>) {
+  const ref = adminDb.collection('bookings').doc(id)
+  await ref.set({ id, ...payload, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true })
+}
+
+export async function getBookingAdmin(id: string): Promise<Booking | null> {
+  const snap = await adminDb.collection('bookings').doc(id).get()
+  if (!snap.exists) return null
+  return snap.data() as Booking
+}
+
