@@ -1,5 +1,6 @@
 import React from 'react'
 import { DateTime } from 'luxon'
+import { Button } from './Button'
 
 type Props = {
   value: { startISO: string; endISO: string } | null
@@ -20,22 +21,36 @@ export function CalendarPicker({ value, onChange }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <input
-        type="date"
-        className="border rounded-2xl px-3 py-2"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-      />
-      <select className="border rounded-2xl px-3 py-2" value={hour} onChange={(e) => setHour(Number(e.target.value))}>
-        {hours.map((h) => (
-          <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
-        ))}
-      </select>
-      <button className="px-4 py-2 rounded-2xl bg-black text-white" onClick={apply}>1時間で選択</button>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-semibold text-gray-700">日付:</label>
+          <input
+            type="date"
+            className="border border-gray-300 rounded-xl px-4 py-2.5 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-semibold text-gray-700">時間:</label>
+          <select 
+            className="border border-gray-300 rounded-xl px-4 py-2.5 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" 
+            value={hour} 
+            onChange={(e) => setHour(Number(e.target.value))}
+          >
+            {hours.map((h) => (
+              <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
+            ))}
+          </select>
+        </div>
+        <Button variant="secondary" onClick={apply}>
+          1時間で選択
+        </Button>
+      </div>
       {value && (
-        <div className="text-sm text-gray-600">
-          選択中: {DateTime.fromISO(value.startISO).toFormat('yyyy/LL/dd HH:mm')} - {DateTime.fromISO(value.endISO).toFormat('HH:mm')}
+        <div className="text-sm font-semibold text-gray-700 bg-primary-50 rounded-lg px-4 py-2 inline-block">
+          📅 選択中: {DateTime.fromISO(value.startISO).toFormat('yyyy年MM月dd日 HH:mm')} - {DateTime.fromISO(value.endISO).toFormat('HH:mm')}
         </div>
       )}
     </div>

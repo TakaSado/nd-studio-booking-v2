@@ -11,9 +11,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
-      <body style={{ ['--accent' as any]: process.env.NEXT_PUBLIC_ACCENT_HEX || '#B3E5FC' }}>
+      <body className="min-h-screen flex flex-col">
         <Header />
-        {children}
+        <main className="flex-1 pt-16 lg:pt-20">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
