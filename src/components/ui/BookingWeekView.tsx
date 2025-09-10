@@ -105,28 +105,26 @@ export function BookingWeekView({ value, onChange, bookedSlots = [] }: BookingWe
     if (isSlotBooked(day.toISODate()!, hour)) return
 
     // 選択モードに応じて処理
-    if (!selectionStart || selectionMode === 'start') {
-      // 開始時間を設定
+    if (!selectionStart) {
+      // 初回クリック：開始時間を設定
       setSelectionStart({ dayIndex, hour })
       setSelectionEnd({ dayIndex, hour: hour + 1 })
       setSelectionMode('end')
-    } else {
-      // 終了時間を設定
-      const newEnd = { dayIndex, hour: hour + 1 }
+    } else if (selectionMode === 'end') {
+      // 2回目のクリック：終了時間を設定
+      const clickedTotal = dayIndex * 24 + hour + 1
       const startTotal = selectionStart.dayIndex * 24 + selectionStart.hour
-      const endTotal = newEnd.dayIndex * 24 + newEnd.hour
       
-      if (endTotal <= startTotal) {
+      if (clickedTotal <= startTotal) {
         // クリックした場所が開始時間より前の場合、新しい開始時間として設定
         setSelectionStart({ dayIndex, hour })
         setSelectionEnd({ dayIndex, hour: hour + 1 })
         setSelectionMode('end')
       } else {
         // 予約済みスロットをまたぐかチェック
-        if (!doesSelectionCrossBookedSlot(selectionStart.dayIndex, selectionStart.hour, newEnd.dayIndex, newEnd.hour)) {
-          setSelectionEnd(newEnd)
-          // 選択完了後、新しい選択を開始できるようにする
-          setSelectionMode('start')
+        if (!doesSelectionCrossBookedSlot(selectionStart.dayIndex, selectionStart.hour, dayIndex, hour + 1)) {
+          setSelectionEnd({ dayIndex, hour: hour + 1 })
+          // 終了時間を設定後も、モードは'end'のままにして、次のクリックで調整可能にする
         } else {
           // 予約済みスロットをまたぐ場合は、新しい開始時間として設定
           setSelectionStart({ dayIndex, hour })
@@ -146,28 +144,27 @@ export function BookingWeekView({ value, onChange, bookedSlots = [] }: BookingWe
     if (isPastTime(day, hour)) return
     if (isSlotBooked(day.toISODate()!, hour)) return
 
-    // ドラッグ開始位置を記録
+    // ドラッグ開始位置のみ記録（選択はまだ設定しない）
     e.preventDefault() // テキスト選択を防ぐ
     setDragStartPos({ dayIndex, hour })
-    setSelectionStart({ dayIndex, hour })
-    setSelectionEnd({ dayIndex, hour: hour + 1 })
-    setSelectionMode('end')
   }
 
   // ドラッグ中の処理
   const handleSlotMouseEnter = (dayIndex: number, hour: number) => {
-    if (!dragStartPos || !selectionStart) return
+    if (!dragStartPos) return
     
     // 実際にドラッグが開始されたかチェック
     if (!isDragging && (dragStartPos.dayIndex !== dayIndex || dragStartPos.hour !== hour)) {
+      // ドラッグ開始時に選択を設定
       setIsDragging(true)
-    }
-    
-    if (isDragging) {
+      setSelectionStart(dragStartPos)
+      setSelectionEnd({ dayIndex, hour: hour + 1 })  // 現在のマウス位置を終了時間として設定
+      setSelectionMode('end')
+    } else if (isDragging) {
       const newEnd = { dayIndex, hour: hour + 1 }
       
       // 予約済みスロットをまたぐかチェック
-      if (!doesSelectionCrossBookedSlot(selectionStart.dayIndex, selectionStart.hour, newEnd.dayIndex, newEnd.hour)) {
+      if (!doesSelectionCrossBookedSlot(dragStartPos.dayIndex, dragStartPos.hour, newEnd.dayIndex, newEnd.hour)) {
         setSelectionEnd(newEnd)
       }
     }
@@ -178,6 +175,9 @@ export function BookingWeekView({ value, onChange, bookedSlots = [] }: BookingWe
     if (dragStartPos && !isDragging) {
       // ドラッグしていない場合はクリックとして処理
       handleSlotClick(dayIndex, hour)
+    } else if (isDragging) {
+      // ドラッグ終了時、選択を維持
+      // selectionModeはendのまま（次のクリックで調整可能）
     }
     
     setIsDragging(false)

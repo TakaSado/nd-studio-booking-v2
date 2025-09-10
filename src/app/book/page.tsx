@@ -37,11 +37,10 @@ export default function BookPage() {
     }
   }, [selectedDateTime])
 
-  async function checkAvailability() {
+  async function proceedToCustomerInfo() {
     if (!slot) return
-    setLoading(true)
-    setStatusMsg('空き状況を確認中...')
-    setStatusType('info')
+    
+    // バックグラウンドで空き状況を確認
     try {
       const res = await fetch('/api/availability', { 
         method: 'POST', 
@@ -50,19 +49,22 @@ export default function BookPage() {
       })
       const data = await res.json()
       if (!data.available) {
-        setStatusMsg('申し訳ありません、その時間は埋まっています。別の時間をお試しください。')
+        // 予約が埋まっていた場合、エラーメッセージを表示
+        setStatusMsg('申し訳ありません、その時間は他の予約が入ってしまいました。別の時間をお選びください。')
         setStatusType('error')
+        // カレンダーを更新するため、ページをリロード
+        setTimeout(() => {
+          window.location.reload()
+        }, 3000)
         return
       }
       ;(window as any).__bookingId = data.bookingId
+      // 問題なければ次のステップへ
       setStep(1)
-      setStatusMsg('空きがあります！お客様情報をご入力ください。')
-      setStatusType('success')
+      setStatusMsg('')
     } catch (error) {
       setStatusMsg('エラーが発生しました。もう一度お試しください。')
       setStatusType('error')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -111,8 +113,8 @@ export default function BookPage() {
       <div className="container-custom py-10">
         {/* ヘッダー */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-3">スタジオ予約</h1>
-          <p className="text-lg text-gray-800 font-medium">簡単3ステップで予約完了</p>
+          <h1 className="text-4xl font-bold mb-3 text-gray-900">スタジオ予約</h1>
+          <p className="text-lg text-gray-700 font-medium">簡単3ステップで予約完了</p>
         </div>
 
         {/* ステッパー */}
@@ -121,7 +123,7 @@ export default function BookPage() {
         </div>
 
         {/* メインコンテンツ */}
-        <div className="max-w-3xl mx-auto">
+        <div className={step === 0 ? "max-w-6xl mx-auto" : "max-w-3xl mx-auto"}>
           {/* ステップ0: 日時選択 */}
           {step === 0 && (
             <Card variant="elevated">
@@ -140,9 +142,8 @@ export default function BookPage() {
                   
                   <div className="flex justify-end">
                     <Button 
-                      onClick={checkAvailability} 
-                      disabled={!selectedDateTime || loading}
-                      isLoading={loading}
+                      onClick={proceedToCustomerInfo} 
+                      disabled={!selectedDateTime}
                       size="lg"
                       rightIcon={
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +151,7 @@ export default function BookPage() {
                         </svg>
                       }
                     >
-                      空き状況を確認して次へ
+                      次へ進む
                     </Button>
                   </div>
                 </div>

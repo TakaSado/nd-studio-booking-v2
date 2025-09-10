@@ -120,14 +120,15 @@ export default function HomePage() {
     <>
       {/* ヒーローセクション */}
       <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-900/30 to-transparent" />
         </div>
         
-        {/* 背景画像 */}
+        {/* 背景画像 - ローカルファイルまたはダークな画像URL */}
+        {/* ローカル画像を使用する場合: src="/images/hero/studio-hero-dark.jpg" */}
         <Image
-          src="https://images.unsplash.com/photo-1579762593217-46655e4e7efc?w=1920&h=1080&fit=crop"
-          alt="NDスタジオ"
+          src="/images/hero/studio-hero-dark.jpg"
+          alt="NDスタジオ - プロフェッショナル撮影スタジオ"
           fill
           className="object-cover"
           priority
