@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: #B3E5FC;
+}
+
+html, body, #__next {
+  height: 100%;
+}
+
+body {
+  color: #111827; /* gray-900 */
+  background: #ffffff;
+}
+
+.container-padded {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+

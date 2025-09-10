@@ -1,0 +1,29 @@
+{
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20",
+    "region": "asia-northeast1"
+  },
+  "hosting": [
+    {
+      "source": ".",
+      "frameworksBackend": {
+        "region": "asia-northeast1"
+      },
+      "rewrites": [
+        {
+          "source": "/api/webhooks/stripe",
+          "function": {
+            "functionId": "apiWebhooksStripe",
+            "region": "asia-northeast1"
+          }
+        }
+      ]
+    }
+  ],
+  "firestore": {
+    "rules": "firebase.rules",
+    "indexes": "firebase.indexes.json"
+  }
+}
+
