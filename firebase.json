@@ -6,6 +6,7 @@
   },
   "hosting": [
     {
+      "site": "nd-studio-v2",
       "source": ".",
       "frameworksBackend": {
         "region": "asia-northeast1"
